@@ -5,18 +5,17 @@ diffExpr <- function(data, targets){
   # getting pval
   design <- model.matrix(~targets$Type)
   colnames(design) <- levels(targets$Type)
-  
+
   fit <- lmFit(data, design)
   fit <- eBayes(fit)
-  #gene_list1 <- topTable(fit, coef=2, number=1000000, sort.by="none",confint = TRUE)
-  
+
   # getting sd
   beta <- fit$coefficients[,2]
   pval <- fit$p.value[,2]
-  #sigma <- sqrt(fit$s2.post)
   sd <- ((sqrt(fit$s2.post)) * (fit$stdev.unscaled))[,2]
+
   gene_list <- data.frame(log2FC = beta, pval = pval, sd = sd, df = fit$df.total)
-  
+
   return(gene_list)
 }
 
@@ -52,21 +51,21 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
   names(beta2) = rownames(gene_list2)
   names(pval1) = rownames(gene_list1)
   names(pval2) = rownames(gene_list2)
-  
+
   #get eci for all genes
   eci <- getECI(beta1,beta2,pval1,pval2)
-  
+
   n <- 1000
   len <- dim(gene_list1)[1]
   num1 <- dim(targets1)[1]
   num2 <- dim(targets2)[1]
-  
+
   group1 = which(targets1[,2] == "tumor")
   group2 = which(targets1[,2] == "normal")
   group3 = which(targets2[,2] == "tumor")
   group4 = which(targets2[,2] == "normal")
   #print(paste(length(group1),length(group2),length(group3),length(group4)))
-  
+
   bootstrap <- matrix(NA, ncol = n, nrow = len)
   for(i in 1:n){
     # if (i %% 10 == 0){
@@ -80,13 +79,13 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
       new2 = c(sample(group3,length(group3),replace = TRUE),sample(group4,length(group4),replace = TRUE))
 
       geneExpr1new[j,] = geneExpr1[j,new1]
-      geneExpr2new[j,] = geneExpr2[j,new2] 
+      geneExpr2new[j,] = geneExpr2[j,new2]
     }
 
     #diff gene expression
     gene_list_B1 = diffExpr(geneExpr1new,targets1)
     gene_list_B2 = diffExpr(geneExpr2new,targets2)
-    
+
     #ECI
     beta_B1 = gene_list_B1$log2FC
     beta_B2 = gene_list_B2$log2FC
@@ -96,11 +95,11 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
     names(beta_B2) = rownames(gene_list_B2)
     names(pval_B1) = rownames(gene_list_B1)
     names(pval_B2) = rownames(gene_list_B2)
-    
+
     #get eci for all genes
     bootstrap[,i] <- getECI(beta_B1,beta_B2,pval_B1,pval_B2)
   }
-  
+
   #confidence intervals
   CI <- matrix(NA,ncol = 2, nrow = len)
   pval <- c()
@@ -108,10 +107,10 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
     #CI[i,] <- bca(bootstrap[i,], conf.level = 1 - alphaU)
     pval[i] <- bootstrap.pval(bootstrap[i,])
   }
-  
+
   result <- data.frame(ECI = eci, p_value = pval)
   rownames(result) <- rownames(gene_list1)
-  
+
   # output only those ECI where at least one of the genes has abs(log2FC) > 1 and pval < 0.05
   if(filter){
     result <- result[(abs(gene_list1$log2FC) > 1 & gene_list1$pval < 0.05) | (abs(gene_list2$log2FC) > 1 & gene_list2$pval < 0.05),]

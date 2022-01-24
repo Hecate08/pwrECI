@@ -24,22 +24,7 @@ ECI_power <- function(alphaU = 0.05,
                       progressMonitor= NULL){
 
   print("ECI power calculation starts")
-  # print(paste(alphaU,
-  #       control_data_sd1,
-  #       control_data_sd2,
-  #       case_data_sd1,
-  #       case_data_sd2,
-  #       meanC1,
-  #       meanC2,
-  #       meanDiff1,
-  #       meanDiff2,
-  #       lowRange,
-  #       highRange,
-  #       seed,
-  #       ngenes,
-  #       sizeG,
-  #       filter,
-  #       rendered_by_shiny))
+
   # function
   sim_expr <- function(ncon,ncase,ngenes, meanC, meanDiff, control_data_sd, case_data_sd){
     case <- matrix(NA, ncol = ncase, nrow = ngenes)

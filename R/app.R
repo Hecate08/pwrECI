@@ -38,10 +38,8 @@ plotPower <- function(df){
     geom_line(size = 0.75) +
     #geom_xspline(spline_shape = -0.5, size = 0.75) +
     geom_hline(yintercept=0.8, linetype="dashed", color = "darkgrey") +
-    xlab("group size") + ylim(0,1) +
-    theme_bw() +
-    scale_x_continuous(breaks=df$x,
-                     labels=df$gs)
+    xlab("Experiment") + ylim(0,1) +
+    theme_bw() + scale_x_continuous(breaks=df$x,labels=as.factor(df$x))
 
   return(p)
 }
@@ -92,8 +90,9 @@ ui = navbarPage(
           numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1),
           checkboxInput("filter", "Filter ECI values for differential expression?", TRUE)
         ) %>% helper(icon = "question", content = "other variables to modify", type = "inline"),
-        actionButton("go", "Go"),
-        actionButton('cancel', 'Cancel')
+        actionButton("go", "Go")
+        #,
+        #actionButton('cancel', 'Cancel')
 
       ),
       mainPanel(
@@ -332,12 +331,13 @@ server = function(input, output) {
       unbalanced = input$unbal)
 
     if(input$unbal){
-      df <- data.frame(gs = groupSize()[,1], gs = groupSize()[,2], Power = data, x = seq(1:length(groupSize()[,1])))
+      df <- data.frame(x = seq(1:length(groupSize()[,1])), gs = groupSize()[,1], gs = groupSize()[,2], Power = data)
     } else {
-      df <- data.frame(gs = groupSize(), gs2 = groupSize(), Power = data, x = seq(1:length(groupSize())))
+      df <- data.frame(x = seq(1:length(groupSize())), gs = groupSize(), gs2 = groupSize(), Power = data)
     }
     df
   })
+
 
   ###################
   # output
@@ -352,10 +352,10 @@ server = function(input, output) {
     if(is.null(powerVals())) return(NULL)
 
 
-    table <- powerVals()[,1:3]
-    colnames(table) <- c("Group size study 1", "Group size study 2","Power")
-    table[,1] <- as.integer(table[,1])
+    table <- powerVals()
+    colnames(table) <- c("Experiment","Group size study 1", "Group size study 2","Power")
     table[,2] <- as.integer(table[,2])
+    table[,3] <- as.integer(table[,3])
 
     table
   }, digits = 3)

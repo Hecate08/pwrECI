@@ -36,10 +36,11 @@ plotPower <- function(df){
   p <- ggplot(df, aes(x,Power)) +
     geom_point(color = "black") +
     geom_line(size = 0.75) +
-    #geom_xspline(spline_shape = -0.5, size = 0.75) +
     geom_hline(yintercept=0.8, linetype="dashed", color = "darkgrey") +
-    xlab("Experiment") + ylim(0,1) +
-    theme_bw() + scale_x_continuous(breaks=df$x,labels=as.factor(df$x))
+    xlab("Experiment") +
+    theme_bw() + scale_x_continuous(breaks=df$x,labels=as.factor(df$x)) +
+    scale_y_continuous(breaks=seq(0,1,0.1), limits=c(0, 1)) +
+    theme(panel.grid.minor = element_blank())
 
   return(p)
 }

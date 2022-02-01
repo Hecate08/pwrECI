@@ -13,8 +13,6 @@ ECI_power <- function(alphaU = 0.05,
                       meanC2 = 3,
                       meanDiff1 = 1,
                       meanDiff2 = 1,
-                      #lowRange = 1,
-                      #highRange = 2.5,
                       seed = 646,
                       ngenes = 1000,
                       sizeG = c(10,20),
@@ -101,17 +99,16 @@ ECI_power <- function(alphaU = 0.05,
 
 
     # differential gene expression
-    gene_listS1 <- diffExpr(sample1,targetsS1)
-    gene_listS2 <- diffExpr(sample2,targetsS2)
+    #gene_listS1 <- diffExpr(sample1,targetsS1)
+    #gene_listS2 <- diffExpr(sample2,targetsS2)
 
     #print(paste(dim(sample1)[2],dim(sample2)[2]))
 
 
     # ECI permutation tests
-    S1vsS2 <- ECIbootstrapTest(gene_listS1, gene_listS2,
-                               sample1,sample2,
+    S1vsS2 <- ECIbootstrapTest(sample1,sample2,
                                targetsS1,targetsS2,
-                               filter=filter, alphaU=alphaU)
+                               filter=filter)
 
     #############################
     # power calculation
@@ -124,7 +121,7 @@ ECI_power <- function(alphaU = 0.05,
     if(g == 1) time <- end_time - start_time
     #if (rendered_by_shiny) shiny::incProgress(1/N)
     if(is.function(updateProgress)) {
-      text <- paste0(g,"/",N," sim. done ","Estimated time: ",round(time*N/60,2)," min")
+      text <- paste0(g,"/",N," sim. done ","Estimated time: ",round(time*N,2)," min")
       updateProgress(value = 1/N, detail = text)
     }
 

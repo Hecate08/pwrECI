@@ -12,9 +12,9 @@ diffExpr <- function(data, targets){
   # getting sd
   beta <- fit$coefficients[,2]
   pval <- fit$p.value[,2]
-  sd <- ((sqrt(fit$s2.post)) * (fit$stdev.unscaled))[,2]
+  #sd <- ((sqrt(fit$s2.post)) * (fit$stdev.unscaled))[,2]
 
-  gene_list <- data.frame(log2FC = beta, pval = pval, sd = sd, df = fit$df.total)
+  gene_list <- data.frame(log2FC = beta, pval = pval, df = fit$df.total)
 
   return(gene_list)
 }
@@ -33,15 +33,19 @@ bootstrap.pval <- function(data){
   return(alpha)
 }
 
-# gene_list1 <- gene_listS1
-# gene_list2 <- gene_listS2
+
 # geneExpr1 <-  sample1
 # geneExpr2 <-  sample2
 # targets1 <- targetsS1
 # targets2<- targetsS2
 # filter = TRUE
 # alphaU = 0.05
-ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1,targets2, filter = TRUE, alphaU = 0.05){
+ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2, filter = TRUE){
+
+  # differential gene expression
+  gene_list1 <- diffExpr(geneExpr1,targets1)
+  gene_list2 <- diffExpr(geneExpr2,targets2)
+
   #get beta values and pvalues from both studies
   beta1 = gene_list1$log2FC
   beta2 = gene_list2$log2FC
@@ -52,7 +56,7 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
   names(pval1) = rownames(gene_list1)
   names(pval2) = rownames(gene_list2)
 
-  #get eci for all genes
+  # get eci for all genes
   eci <- getECI(beta1,beta2,pval1,pval2)
 
   n <- 1000
@@ -66,6 +70,7 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
   group4 = which(targets2[,2] == "normal")
   #print(paste(length(group1),length(group2),length(group3),length(group4)))
 
+  # bootstrap
   bootstrap <- matrix(NA, ncol = n, nrow = len)
   for(i in 1:n){
     # if (i %% 10 == 0){
@@ -104,7 +109,6 @@ ECIbootstrapTest <- function(gene_list1,gene_list2, geneExpr1,geneExpr2,targets1
   CI <- matrix(NA,ncol = 2, nrow = len)
   pval <- c()
   for(i in 1:len){
-    #CI[i,] <- bca(bootstrap[i,], conf.level = 1 - alphaU)
     pval[i] <- bootstrap.pval(bootstrap[i,])
   }
 

@@ -58,8 +58,8 @@ ECI_power <- function(alphaU = 0.05,
     text <- paste0(0,"/",N)
     updateProgress(detail = text)
   }
-  #print("initial detail for progress bar set")
 
+  start_time1 <- Sys.time()
   # main part
   time <- 0
   Power <- c()
@@ -97,13 +97,6 @@ ECI_power <- function(alphaU = 0.05,
     sample2 <- sim_expr(ncon2,ncase2,ngenes, meanC2, meanDiff2, control_data_sd2, case_data_sd2)
 
 
-    # differential gene expression
-    #gene_listS1 <- diffExpr(sample1,targetsS1)
-    #gene_listS2 <- diffExpr(sample2,targetsS2)
-
-    #print(paste(dim(sample1)[2],dim(sample2)[2]))
-
-
     # ECI permutation tests
     S1vsS2 <- ECIbootstrapTest(sample1,sample2,
                                targetsS1,targetsS2)
@@ -125,5 +118,6 @@ ECI_power <- function(alphaU = 0.05,
 
     if(is.function(progressMonitor)) progressMonitor(g)
   }
+  end_time1 <- Sys.time(); print(end_time1 - start_time1)
   return(Power)
 }

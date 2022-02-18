@@ -87,7 +87,8 @@ ui = navbarPage(
           "Other",
           #numericRangeInput("equiRange", label = "Range for equivalence", value = c(1,2.5), min = 0),
           numericInput("seed", "starting seed", value = 654654, min = 0),
-          numericInput("ngenes", "number of iterations for power calculation", value = 1000, min = 1, max = 100000),
+          selectInput("ngenes", "number of iterations for power calculation",
+                      c("500" = "500", "1000" = "1000", "10,000" = "10000"), selected = "1000"),
           numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1)
         ) %>% helper(icon = "question", content = "other variables to modify", type = "inline"),
         actionButton("go", "Go")
@@ -199,6 +200,7 @@ server = function(input, output) {
   output$gS <- renderText({
     if(is.null(groupSize())) return("Please provide equal range for group sizes for both studies")
   })
+
   # output$gS <- renderText({
   #   c(input$conSD1,
   #     input$conSD2,
@@ -323,7 +325,7 @@ server = function(input, output) {
       #lowRange = min(input$equiRange),
       #highRange = max(input$equiRange),
       seed = input$seed,
-      ngenes = input$ngenes,
+      ngenes = as.numeric(input$ngenes),
       sizeG = groupSize(),
       updateProgress = updateProgress,
       unbalanced = input$unbal)

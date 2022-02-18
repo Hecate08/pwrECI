@@ -57,7 +57,7 @@ ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2){
   # get eci for all genes
   eci <- getECI(beta1,beta2,pval1,pval2)
 
-  n <- 10
+  n <- 1000
   len <- dim(gene_list1)[1]
   num1 <- dim(targets1)[1]
   num2 <- dim(targets2)[1]

@@ -87,9 +87,8 @@ ui = navbarPage(
           "Other",
           #numericRangeInput("equiRange", label = "Range for equivalence", value = c(1,2.5), min = 0),
           numericInput("seed", "starting seed", value = 654654, min = 0),
-          numericInput("ngenes", "number of iterations for power calculation", value = 1000, min = 1),
-          numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1),
-          checkboxInput("filter", "Filter ECI values for differential expression?", TRUE)
+          numericInput("ngenes", "number of iterations for power calculation", value = 1000, min = 1, max = 100000),
+          numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1)
         ) %>% helper(icon = "question", content = "other variables to modify", type = "inline"),
         actionButton("go", "Go")
         #,
@@ -257,7 +256,6 @@ server = function(input, output) {
   #       seed = input$seed,
   #       ngenes = input$ngenes,
   #       sizeG = groupSize(),
-  #       filter = input$filter,
   #       updateProgress = updateProgress,
   #       unbalanced = input$unbal,
   #       progressMonitor = function(i) interruptor$execInterrupts())
@@ -327,7 +325,6 @@ server = function(input, output) {
       seed = input$seed,
       ngenes = input$ngenes,
       sizeG = groupSize(),
-      filter = input$filter,
       updateProgress = updateProgress,
       unbalanced = input$unbal)
 

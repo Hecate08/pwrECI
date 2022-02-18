@@ -16,7 +16,6 @@ ECI_power <- function(alphaU = 0.05,
                       seed = 646,
                       ngenes = 1000,
                       sizeG = c(10,20),
-                      filter = TRUE,
                       updateProgress = NULL,
                       unbalanced = FALSE,
                       progressMonitor= NULL){
@@ -107,8 +106,7 @@ ECI_power <- function(alphaU = 0.05,
 
     # ECI permutation tests
     S1vsS2 <- ECIbootstrapTest(sample1,sample2,
-                               targetsS1,targetsS2,
-                               filter=filter)
+                               targetsS1,targetsS2)
 
     #############################
     # power calculation

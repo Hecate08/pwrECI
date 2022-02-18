@@ -17,7 +17,7 @@ For the purpose of identifying equivalently changed genes we use the ECI bootstr
 
 The app is designed in a way that the group sizes are balanced in one study (control and case) but could be unbalanced between the two studies. The user can decide to calculate the power for only one group size (balanced or unbalanced) or for multiple group sizes where the power will be calculated pairwise for unbalanced group sizes. Hence, it is neccesary to give the same number of group sizes for both studies. The group sizes could be defined sequentially as range input, where the starting point of the list ("from"), the end point of the list ("to") and the step size for the increment in the list ("by") must be defined. The group size could also be defined in a list of group sizes seperated by space.
 
-Finally, the user can define some miscellaneous values such as the number of iterations to calculate the power or the starting seed for reproducable results. Addionally, the user can define if the ECI values should be filtered by at least one of the studies has a differentially expressed gene. 
+Finally, the user can define some miscellaneous values such as the number of iterations to calculate the power or the starting seed for reproducable results. 
 
 In the following is demonstrated an example on how to use the app:
 

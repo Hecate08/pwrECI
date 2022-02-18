@@ -22,13 +22,12 @@ diffExpr <- function(data, targets){
 ###########
 # ECI
 
-bootstrap.pval <- function(data){
+bootstrap.pval <- function(data, ES){
   B = 1000
-  pE <- mean(data)
-  N = sum(data < pE)
+  N = sum(data < ES)
   M = sum(data < 0 )
   alpha1 = pnorm(-2*qnorm(N/B) + qnorm(M/B))
-  if(pE < 0) alpha1 = 1 - alpha1
+  if(ES < 0) alpha1 = 1 - alpha1
   alpha = 2*alpha1
   return(alpha)
 }
@@ -38,9 +37,8 @@ bootstrap.pval <- function(data){
 # geneExpr2 <-  sample2
 # targets1 <- targetsS1
 # targets2<- targetsS2
-# filter = TRUE
 # alphaU = 0.05
-ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2, filter = TRUE){
+ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2){
 
   # differential gene expression
   gene_list1 <- diffExpr(geneExpr1,targets1)
@@ -59,7 +57,7 @@ ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2, filter = TRU
   # get eci for all genes
   eci <- getECI(beta1,beta2,pval1,pval2)
 
-  n <- 1000
+  n <- 10
   len <- dim(gene_list1)[1]
   num1 <- dim(targets1)[1]
   num2 <- dim(targets2)[1]
@@ -77,6 +75,7 @@ ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2, filter = TRU
     #  print(i)
     # }
     #Bootstrap sampling
+
     geneExpr1new <- matrix(NA, ncol = num1, nrow = len)
     geneExpr2new <- matrix(NA, ncol = num2, nrow = len)
     for(j in 1:len){
@@ -109,16 +108,12 @@ ECIbootstrapTest <- function(geneExpr1,geneExpr2,targets1,targets2, filter = TRU
   CI <- matrix(NA,ncol = 2, nrow = len)
   pval <- c()
   for(i in 1:len){
-    pval[i] <- bootstrap.pval(bootstrap[i,])
+    pval[i] <- bootstrap.pval(bootstrap[i,], eci[i])
   }
 
   result <- data.frame(ECI = eci, p_value = pval)
   rownames(result) <- rownames(gene_list1)
 
-  # output only those ECI where at least one of the genes has abs(log2FC) > 1 and pval < 0.05
-  if(filter){
-    result <- result[(abs(gene_list1$log2FC) > 1 & gene_list1$pval < 0.05) | (abs(gene_list2$log2FC) > 1 & gene_list2$pval < 0.05),]
-  }
   return(result)
 }
 

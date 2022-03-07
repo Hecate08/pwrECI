@@ -14,7 +14,7 @@ diffExpr <- function(data, targets){
   pval <- fit$p.value[,2]
   #sd <- ((sqrt(fit$s2.post)) * (fit$stdev.unscaled))[,2]
 
-  gene_list <- data.frame(log2FC = beta, pval = pval, df = fit$df.total)
+  gene_list <- data.frame(log2FC = beta, pval = pval)
 
   return(gene_list)
 }

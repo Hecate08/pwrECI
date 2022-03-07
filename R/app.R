@@ -16,7 +16,6 @@ plan(multiprocess)
 
 
 # libraries for ECI power function
-library(coxed)
 library(truncnorm)
 library(matrixStats)
 library(limma)
@@ -33,12 +32,15 @@ library(ggalt)
 # functions
 ##################
 plotPower <- function(df){
-  p <- ggplot(df, aes(x,Power)) +
+  df2 <- data.frame(x = rep(df$x,2), Power = c(df$Power, df$adjPower),
+                    type = rep(c("Power", "adjusted Power"), each = dim(df)[1]))
+
+  p <- ggplot(df2, aes(x,Power, color = type)) +
     geom_point(color = "black") +
     geom_line(size = 0.75) +
     geom_hline(yintercept=0.8, linetype="dashed", color = "darkgrey") +
     xlab("Experiment") +
-    theme_bw() + scale_x_continuous(breaks=df$x,labels=as.factor(df$x)) +
+    theme_bw() + scale_x_continuous(breaks=df2$x,labels=as.factor(df2$x)) +
     scale_y_continuous(breaks=seq(0,1,0.1), limits=c(0, 1)) +
     theme(panel.grid.minor = element_blank())
 
@@ -84,12 +86,19 @@ ui = navbarPage(
         ),
 
         bsCollapsePanel(
+          "FDR adjusted Power calculation",
+          numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1),
+          numericInput("d", "ratio of equivalent genes", value = 0.3, min = 0, max = 1),
+          numericInput("m", "number of genes m", value = 20000, min = 0),
+          numericInput("f", "FDR level", value = 0.05, min = 0, max = 1)
+        ) %>% helper(icon = "question", content = "variables regarding FDR adjusted power calculation", type = "inline"),
+
+        bsCollapsePanel(
           "Other",
           #numericRangeInput("equiRange", label = "Range for equivalence", value = c(1,2.5), min = 0),
           numericInput("seed", "starting seed", value = 654654, min = 0),
           selectInput("ngenes", "number of iterations for power calculation",
-                      c("500" = "500", "1000" = "1000", "10,000" = "10000"), selected = "1000"),
-          numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1)
+                      c("500" = "500", "1000" = "1000", "10,000" = "10000"), selected = "1000")
         ) %>% helper(icon = "question", content = "other variables to modify", type = "inline"),
         actionButton("go", "Go")
         #,
@@ -322,18 +331,19 @@ server = function(input, output) {
       meanC2 = input$conMean2,
       meanDiff1 = input$MeanDiff1,
       meanDiff2 = input$MeanDiff2,
-      #lowRange = min(input$equiRange),
-      #highRange = max(input$equiRange),
       seed = input$seed,
       ngenes = as.numeric(input$ngenes),
       sizeG = groupSize(),
+      m = input$m,
+      d = input$d,
+      f = input$f,
       updateProgress = updateProgress,
       unbalanced = input$unbal)
 
     if(input$unbal){
-      df <- data.frame(x = seq(1:length(groupSize()[,1])), gs = groupSize()[,1], gs = groupSize()[,2], Power = data)
+      df <- data.frame(x = seq(1:length(groupSize()[,1])), gs = groupSize()[,1], gs2 = groupSize()[,2], Power = data[,1], adjPower = data[,2])
     } else {
-      df <- data.frame(x = seq(1:length(groupSize())), gs = groupSize(), gs2 = groupSize(), Power = data)
+      df <- data.frame(x = seq(1:length(groupSize())), gs = groupSize(), gs2 = groupSize(), Power = data[,1], adjPower = data[,2])
     }
     df
   })
@@ -353,7 +363,7 @@ server = function(input, output) {
 
 
     table <- powerVals()
-    colnames(table) <- c("Experiment","Group size study 1", "Group size study 2","Power")
+    colnames(table) <- c("Experiment","Group size study 1", "Group size study 2", "Power", "FDR adjusted Power")
     table[,2] <- as.integer(table[,2])
     table[,3] <- as.integer(table[,3])
 

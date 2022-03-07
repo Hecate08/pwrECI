@@ -16,6 +16,7 @@ ECI_power <- function(alphaU = 0.05,
                       seed = 646,
                       ngenes = 1000,
                       sizeG = c(10,20),
+                      d = 0.3,m = 20000, f = 0.05,
                       updateProgress = NULL,
                       unbalanced = FALSE,
                       progressMonitor= NULL){
@@ -63,6 +64,7 @@ ECI_power <- function(alphaU = 0.05,
   # main part
   time <- 0
   Power <- c()
+  Power2 <- c()
   for(g in 1:N){
 
     start_time <- Sys.time()
@@ -107,9 +109,13 @@ ECI_power <- function(alphaU = 0.05,
 
     Power[g] <- sum(S1vsS2$p_value < alphaU)/dim(S1vsS2)[1]
 
+    m0 = d * m
+    alphaS = Power[g]*f/(m0*(1-f))
+    Power2[g] = sum(S1vsS2$p_value < alphaS)/dim(S1vsS2)[1]
+
     print(g)
     end_time <- Sys.time()
-    if(g == 1) time <- end_time - start_time
+    if(g == 1) time <- difftime(end_time, start_time, units='mins')
     #if (rendered_by_shiny) shiny::incProgress(1/N)
     if(is.function(updateProgress)) {
       text <- paste0(g,"/",N," sim. done ","Estimated time: ",round(time*N,2)," min")
@@ -119,5 +125,6 @@ ECI_power <- function(alphaU = 0.05,
     if(is.function(progressMonitor)) progressMonitor(g)
   }
   end_time1 <- Sys.time(); print(end_time1 - start_time1)
-  return(Power)
+  res = cbind(Power,Power2)
+  return(res)
 }

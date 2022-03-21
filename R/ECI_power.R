@@ -16,7 +16,7 @@ ECI_power <- function(alphaU = 0.05,
                       seed = 646,
                       ngenes = 1000,
                       sizeG = c(10,20),
-                      d = 0.3,m = 20000, f = 0.05,
+                      m1 = 300, m = 20000, f = 0.05,
                       updateProgress = NULL,
                       unbalanced = FALSE,
                       progressMonitor= NULL){
@@ -109,8 +109,9 @@ ECI_power <- function(alphaU = 0.05,
 
     Power[g] <- sum(S1vsS2$p_value < alphaU)/dim(S1vsS2)[1]
 
-    m0 = d * m
-    alphaS = Power[g]*f/(m0*(1-f))
+    m0 = m - m1
+    alphaS = m1*Power[g]*f/(m0*(1-f))
+    print(paste(m1*Power[g],alphaS))
     Power2[g] = sum(S1vsS2$p_value < alphaS)/dim(S1vsS2)[1]
 
     print(g)

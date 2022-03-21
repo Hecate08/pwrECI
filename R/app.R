@@ -54,7 +54,7 @@ plotPower <- function(df){
 #################
 
 ui = navbarPage(
-  title = "ECI power calculation", # title for app
+  title = "pwrECI", # title for app
   theme = shinytheme("cerulean"), # sets color theme
   tabPanel(
     "Main",
@@ -88,8 +88,8 @@ ui = navbarPage(
         bsCollapsePanel(
           "FDR adjusted Power calculation",
           numericInput("alphaU", "alpha", value = 0.05, min = 0, max = 1),
-          numericInput("d", "ratio of equivalent genes", value = 0.3, min = 0, max = 1),
-          numericInput("m", "number of genes m", value = 20000, min = 0),
+          numericInput("m1", "number of prognostic genes", value = 300, min = 0),
+          numericInput("m", "total number of genes m", value = 20000, min = 0),
           numericInput("f", "FDR level", value = 0.05, min = 0, max = 1)
         ) %>% helper(icon = "question", content = "variables regarding FDR adjusted power calculation", type = "inline"),
 
@@ -120,7 +120,7 @@ ui = navbarPage(
   ),
   tabPanel(
     "About",
-    textOutput("Developers")
+    includeMarkdown("about.md")
 
   )
 )
@@ -335,7 +335,7 @@ server = function(input, output) {
       ngenes = as.numeric(input$ngenes),
       sizeG = groupSize(),
       m = input$m,
-      d = input$d,
+      m1 = input$m1,
       f = input$f,
       updateProgress = updateProgress,
       unbalanced = input$unbal)
@@ -370,13 +370,11 @@ server = function(input, output) {
     table
   }, digits = 3)
 
-  # other tabs
-  output$text <- renderText({
-    "test"
-  })
-  output$Developers <- renderText({
-    "Lisa Neums"
-  })
+  # # other tabs
+  # output$text <- renderText({
+  #   "test"
+  # })
+
 
 
 

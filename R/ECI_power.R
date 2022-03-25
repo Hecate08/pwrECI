@@ -21,7 +21,7 @@ ECI_power <- function(alphaU = 0.05,
                       unbalanced = FALSE,
                       progressMonitor= NULL){
 
-  print("ECI power calculation starts")
+  #print("ECI power calculation starts")
 
   # function
   sim_expr <- function(ncon,ncase,ngenes, meanC, meanDiff, control_data_sd, case_data_sd){
@@ -41,12 +41,12 @@ ECI_power <- function(alphaU = 0.05,
   #print("loaded function")
 
   # variables
-  if(unbalanced){
-    print("unbalanced")
-  } else {
-    print("balanced")
-  }
-  print(sizeG)
+  # if(unbalanced){
+  #   print("unbalanced")
+  # } else {
+  #   print("balanced")
+  # }
+  #print(sizeG)
   N <- 0
   if(unbalanced){
     N <- dim(sizeG)[1]
@@ -60,7 +60,7 @@ ECI_power <- function(alphaU = 0.05,
     updateProgress(detail = text)
   }
 
-  start_time1 <- Sys.time()
+  #start_time1 <- Sys.time()
   # main part
   time <- 0
   Power <- c()
@@ -111,13 +111,12 @@ ECI_power <- function(alphaU = 0.05,
 
     m0 = m - m1
     alphaS = m1*Power[g]*f/(m0*(1-f))
-    print(paste(m1*Power[g],alphaS))
+    #print(paste(m1*Power[g],alphaS))
     Power2[g] = sum(S1vsS2$p_value < alphaS)/dim(S1vsS2)[1]
 
-    print(g)
+    #print(g)
     end_time <- Sys.time()
     if(g == 1) time <- difftime(end_time, start_time, units='mins')
-    #if (rendered_by_shiny) shiny::incProgress(1/N)
     if(is.function(updateProgress)) {
       text <- paste0(g,"/",N," sim. done ","Estimated time: ",round(time*N,2)," min")
       updateProgress(value = 1/N, detail = text)
@@ -125,7 +124,7 @@ ECI_power <- function(alphaU = 0.05,
 
     if(is.function(progressMonitor)) progressMonitor(g)
   }
-  end_time1 <- Sys.time(); print(end_time1 - start_time1)
+  #end_time1 <- Sys.time(); print(difftime(end_time1, start_time1, units='mins'))
   res = cbind(Power,Power2)
   return(res)
 }

@@ -95,7 +95,6 @@ ui = navbarPage(
 
         bsCollapsePanel(
           "Other",
-          #numericRangeInput("equiRange", label = "Range for equivalence", value = c(1,2.5), min = 0),
           numericInput("seed", "starting seed", value = 654654, min = 0),
           selectInput("ngenes", "number of iterations for power calculation",
                       c("500" = "500", "1000" = "1000", "10,000" = "10000"), selected = "1000")
@@ -142,7 +141,6 @@ server = function(input, output) {
       })
   output$listORrange <- renderUI({
     if(is.null(input$radio)) return(NULL)
-    #validate(need(!is.null(input$radio), "please select an input type"))
     if(input$radio == "list"){
       textInput("myList", "list input", "10 20 30")
     } else {
@@ -151,7 +149,6 @@ server = function(input, output) {
         numericInput("to1", "to", value = 50, min = 1),
         numericInput("by1", "by", value = 20, min = 1)
       )
-      #textInput("myRange", "range input (from, to, by)", "10, 50, 20")
     }
   })
   output$listORrangechoice2 <- renderUI({
@@ -160,7 +157,6 @@ server = function(input, output) {
   })
   output$listORrange2 <- renderUI({
     if(is.null(input$radio2)) return(NULL)
-    #validate(need(!is.null(input$radio), "please select an input type"))
     if(input$radio2 == "list2"){
       textInput("myList2", NULL, "10 20 30")
     } else if(input$radio2 == "range2"){
@@ -169,7 +165,6 @@ server = function(input, output) {
         numericInput("to2", "to", value = 60, min = 1),
         numericInput("by2", "by", value = 20, min = 1)
       )
-      #textInput("myRange2", "study 2 range input (from, to, by)", "10, 50, 20")
     } else {}
   })
 
@@ -180,8 +175,6 @@ server = function(input, output) {
       gs <- as.numeric(unlist(strsplit(as.character(input$myList), " ")))
     } else {
       if(is.null(input$from1) | is.null(input$to1) | is.null(input$by1)) return(NULL)
-      #val <- as.numeric(unlist(strsplit(as.character(input$myRange), ", ")))
-      #gs <- seq(val[1],val[2],val[3])
       gs <- seq(input$from1,input$to1, input$by1)
     }
   })
@@ -192,8 +185,6 @@ server = function(input, output) {
       gs <- as.numeric(unlist(strsplit(as.character(input$myList2), " ")))
     } else {
       if(is.null(input$from2) | is.null(input$to2) | is.null(input$by2)) return(NULL)
-      #val <- as.numeric(unlist(strsplit(as.character(input$myRange2), ", ")))
-      #gs <- seq(val[1],val[2],val[3])
       gs <- seq(input$from2,input$to2, input$by2)
     }
   })
@@ -208,105 +199,13 @@ server = function(input, output) {
   })
   output$gS <- renderText({
     if(is.null(groupSize())) return("Please provide equal range for group sizes for both studies")
+    else if(length(gs1()) > 50) return("Please test less than 50 experiments at once")
   })
 
-  # output$gS <- renderText({
-  #   c(input$conSD1,
-  #     input$conSD2,
-  #   input$caseSD1,
-  #   input$caseSD2,
-  #   input$conMean1,
-  #   input$conMean2,
-  #   input$MeanDiff1,
-  #   input$MeanDiff2,
-  #   min(input$equiRange),
-  #   max(input$equiRange),
-  #   input$seed)
-  # })
-
-  ###################
-  #receiving data
-  # interruptor <- AsyncInterruptor$new()    # To signal STOP to the future
-  # powerVals <- reactiveVal()
-  # running <- reactiveVal(FALSE)
-  #
-  # observeEvent(input$go,{
-  #
-  #   if(is.null(groupSize())) return(NULL)
-  #
-  #   if(running()) return(NULL)
-  #   running(TRUE)
-  #
-  #   # Create new progress bar
-  #   progress <- AsyncProgress$new(message="Complex analysis")
-  #
-  #   powerVals(NULL)
-  #
-  #   progress$set(message = "Power calculation: ", value = 0)
-  #   #on.exit(progress$close())
-  #
-  #   updateProgress <- function(value = NULL, detail = NULL) {
-  #     if (is.null(value)) {
-  #       progress$set(detail = detail)
-  #     } else {
-  #       progress$inc(amount = value, detail = detail)
-  #     }
-  #   }
-  #
-  #   fut <- future({
-  #     data <- ECI_power(
-  #       alphaU = input$alphaU,
-  #       control_data_sd1 = input$conSD1,
-  #       control_data_sd2 = input$conSD2,
-  #       case_data_sd1 = input$caseSD1,
-  #       case_data_sd2 = input$caseSD2,
-  #       meanC1 = input$conMean1,
-  #       meanC2 = input$conMean2,
-  #       meanDiff1 = input$MeanDiff1,
-  #       meanDiff2 = input$MeanDiff2,
-  #       seed = input$seed,
-  #       ngenes = input$ngenes,
-  #       sizeG = groupSize(),
-  #       updateProgress = updateProgress,
-  #       unbalanced = input$unbal,
-  #       progressMonitor = function(i) interruptor$execInterrupts())
-  #
-  #     if(input$unbal){
-  #       df <- data.frame(gs = groupSize()[,1], gs = groupSize()[,2], Power = data, x = seq(1:length(groupSize()[,1])))
-  #     } else {
-  #       df <- data.frame(gs = groupSize(), gs2 = groupSize(), Power = data, x = seq(1:length(groupSize())))
-  #     }
-  #     df
-  #   }) %...>% powerVals
-  #
-  #   # Show notification on error or user interrupt
-  #   fut <- catch(fut,
-  #                function(e){
-  #                  powerVals(NULL)
-  #                  print(e$message)
-  #                  showNotification(e$message)
-  #                })
-  #   # When done with analysis, remove progress bar
-  #   fut <- finally(fut, function(){
-  #     progress$close()
-  #     running(FALSE) # Declare done with run
-  #   })
-  #
-  #   # Return something other than the future so we don't block the UI
-  #   NULL
-  #
-  # })
-  #
-  # # Send interrupt signal to future
-  # observeEvent(input$cancel,{
-  #   if(running())
-  #     interruptor$interrupt("User Interrupt")
-  # })
-  #
 
   powerVals <- eventReactive(input$go,{
-    #withProgress(message = 'Power calculation, please wait', value = 0, {
     if(is.null(groupSize())) return(NULL)
+    else if(length(gs1()) > 50) return(NULL)
 
     progress <- shiny::Progress$new()
     progress$set(message = "Power calculation: ", value = 0)

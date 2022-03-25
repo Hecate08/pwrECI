@@ -17,4 +17,4 @@ developers: Lisa Neums, Jeffrey A. Thompson
 
 license: MIT License
 
-source code: https://github.com/Hecate08/ECIpowerApp
+source code: https://github.com/Hecate08/pwrECI

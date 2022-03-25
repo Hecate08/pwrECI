@@ -1,13 +1,11 @@
 ---
-title: 
+title: "pwrECI: calculating power using ECI bootstrap test"
 author: 
 date: 
 output: 
   html_document:
     keep_md: true
 ---
-
-# pwrECI: calculating power using ECI bootstrap test
 
 date: 3/21/2022
 

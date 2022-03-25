@@ -12,14 +12,14 @@ library(magrittr)
 library(ipc)
 library(future)
 library(promises)
-plan(multiprocess)
+#plan(multiprocess)
 
 
 # libraries for ECI power function
 library(truncnorm)
 library(matrixStats)
 library(limma)
-library(ECEA)
+#library(ECEA)
 source("ECI_power.R", local = TRUE)
 source("ECI_functions_power.R", local = TRUE)
 

@@ -1,0 +1,11 @@
+name: pwreci
+title:
+username:
+account: lneums
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5934372
+bundleId: 5726563
+url: https://lneums.shinyapps.io/pwreci/
+when: 1648215437.29067
+lastSyncTime: 1648215437.29067
